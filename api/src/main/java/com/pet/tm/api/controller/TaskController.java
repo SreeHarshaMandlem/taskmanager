@@ -2,8 +2,10 @@ package com.pet.tm.api.controller;
 
 import com.pet.tm.api.entity.TaskEntity;
 import com.pet.tm.api.service.TaskService;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -18,7 +20,7 @@ public class TaskController {
   }
 
   @PostMapping(consumes = APPLICATION_JSON_VALUE)
-  public TaskEntity createTask(@NonNull @RequestBody TaskEntity task) {
+  public TaskEntity createTask(@Valid @NotNull @RequestBody TaskEntity task) {
     return taskService.createTask(task);
   }
 }
