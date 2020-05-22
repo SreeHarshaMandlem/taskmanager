@@ -1,5 +1,6 @@
 package com.pet.tm.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity(name = "TASK")
 @Data
+@Builder
 public class TaskEntity {
 
   @Id @GeneratedValue private Long id;
