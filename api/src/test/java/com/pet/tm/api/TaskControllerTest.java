@@ -2,6 +2,7 @@ package com.pet.tm.api;
 
 import com.pet.tm.api.dto.ErrorDto;
 import com.pet.tm.api.entity.TaskEntity;
+import com.pet.tm.api.entity.UserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskControllerTest {
 
   private static final String TASK_API = "/api/task";
+
+  private static final String USER_API = "/api/user";
 
   @Autowired private TestRestTemplate testRestTemplate = new TestRestTemplate();
 
@@ -43,7 +46,7 @@ public class TaskControllerTest {
   }
 
   @Test
-  public void shouldCreateTask() {
+  public void shouldCreateTask_WithOutAssignee() {
     ResponseEntity<TaskEntity> response =
         testRestTemplate.postForEntity(
             TASK_API,
@@ -60,5 +63,39 @@ public class TaskControllerTest {
         "Test description",
         taskEntity.getDescription(),
         "Task entity title is not as expected: Test description");
+  }
+
+  @Test
+  public void shouldCreateTask_WithAssignee() {
+    // Precondition User must exist
+    ResponseEntity<UserEntity> responseUser =
+        testRestTemplate.postForEntity(
+            USER_API, UserEntity.builder().name("Test Name").build(), UserEntity.class);
+
+    UserEntity userEntity = responseUser.getBody();
+
+    ResponseEntity<TaskEntity> response =
+        testRestTemplate.postForEntity(
+            TASK_API,
+            TaskEntity.builder()
+                .title("Test title")
+                .description("Test description")
+                .assignee(userEntity)
+                .build(),
+            TaskEntity.class);
+
+    TaskEntity taskEntity = response.getBody();
+
+    assertNotNull(taskEntity, "Task entity is null. Expected: Not null");
+    assertNotNull(taskEntity.getId(), "Task entity {id} is null. Expected: Not null");
+    assertEquals(
+        "Test title", taskEntity.getTitle(), "Task entity title is not as expected: Test title");
+    assertEquals(
+        "Test description",
+        taskEntity.getDescription(),
+        "Task entity title is not as expected: Test description");
+
+    assertNotNull(taskEntity.getAssignee());
+    assertEquals(userEntity.getId(), taskEntity.getAssignee().getId());
   }
 }
