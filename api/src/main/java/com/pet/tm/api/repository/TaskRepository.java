@@ -1,4 +1,4 @@
-package com.pet.tm.api.service;
+package com.pet.tm.api.repository;
 
 import com.pet.tm.api.entity.TaskEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

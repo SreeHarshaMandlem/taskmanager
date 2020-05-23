@@ -1,6 +1,7 @@
 package com.pet.tm.api.service;
 
 import com.pet.tm.api.entity.TaskEntity;
+import com.pet.tm.api.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
