@@ -3,9 +3,7 @@ package com.pet.tm.api.entity;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity(name = "TASK")
@@ -22,4 +20,8 @@ public class TaskEntity {
   private String description;
 
   private String status = "open";
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "ASSIGNEE")
+  private UserEntity assignee;
 }
