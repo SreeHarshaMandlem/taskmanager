@@ -9,31 +9,35 @@ import java.util.UUID;
 @Builder
 public class ErrorDto {
 
-	private String id;
+  private String id;
 
-	private String message;
+  private String message;
 
-	private int code;
+  private int code;
 
-	public static class ErrorDtoBuilder {
-		private String id;
+  /**
+   * This builder is used by Lombok with @Builder annotation. While @Builder normally generates a
+   * similar builder, to auto generate id this custom builder is added.
+   */
+  public static class ErrorDtoBuilder {
+    private String id;
 
-		private String message;
+    private String message;
 
-		private int code;
+    private int code;
 
-		public ErrorDtoBuilder message(String message) {
-			this.message = message;
-			return this;
-		}
+    public ErrorDtoBuilder message(String message) {
+      this.message = message;
+      return this;
+    }
 
-		public ErrorDtoBuilder code(int code) {
-			this.code = code;
-			return this;
-		}
+    public ErrorDtoBuilder code(int code) {
+      this.code = code;
+      return this;
+    }
 
-		public ErrorDto build() {
-			return new ErrorDto(UUID.randomUUID().toString(), message, code);
-		}
-	}
+    public ErrorDto build() {
+      return new ErrorDto(UUID.randomUUID().toString(), message, code);
+    }
+  }
 }

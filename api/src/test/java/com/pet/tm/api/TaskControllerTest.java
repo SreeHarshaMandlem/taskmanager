@@ -19,7 +19,7 @@ public class TaskControllerTest {
   @Autowired private TestRestTemplate testRestTemplate = new TestRestTemplate();
 
   @Test
-  public void when_Creating_TaskTitleIsEmpty_Expect_ErrorDto_MethodArgumentNotValidException() {
+  public void whenCreatingTask_IfTitleIsEmpty_Expect_ErrorDto_MethodArgumentNotValidException() {
     ResponseEntity<ErrorDto> response =
         testRestTemplate.postForEntity(
             TASK_API, TaskEntity.builder().description("Test description").build(), ErrorDto.class);
@@ -31,7 +31,7 @@ public class TaskControllerTest {
   }
 
   @Test
-  public void when_Creating_TaskDescIsEmpty_Expect_ErrorDto_MethodArgumentNotValidException() {
+  public void whenCreatingTask_IfDescIsEmpty_Expect_ErrorDto_MethodArgumentNotValidException() {
     ResponseEntity<ErrorDto> response =
         testRestTemplate.postForEntity(
             TASK_API, TaskEntity.builder().title("Test title").build(), ErrorDto.class);
@@ -43,7 +43,7 @@ public class TaskControllerTest {
   }
 
   @Test
-  public void ok() {
+  public void shouldCreateTask() {
     ResponseEntity<TaskEntity> response =
         testRestTemplate.postForEntity(
             TASK_API,
