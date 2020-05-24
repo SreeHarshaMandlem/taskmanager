@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -136,21 +138,25 @@ public class TaskControllerTest {
 
   @Test
   public void shouldGetTasks() {
-    // Precondition Task must exist
-    int numberOfTasks = 2;
-    for (int i = 0; i < numberOfTasks; i++) {
+    // Precondition Tasks must exist
+    List<TaskEntity> preTasks = new ArrayList<>();
+    for (int i = 0; i < 2; i++) {
       ResponseEntity<TaskEntity> taskResponse =
           testRestTemplate.postForEntity(
               TASK_API,
               TaskEntity.builder().title("Test title").description("Test description").build(),
               TaskEntity.class);
+      preTasks.add(taskResponse.getBody());
     }
 
-    ResponseEntity<List> response = testRestTemplate.getForEntity(TASK_API, List.class);
+    // Test
+    ResponseEntity<TaskEntity[]> response =
+        testRestTemplate.getForEntity(TASK_API, TaskEntity[].class);
 
-    List tasks = response.getBody();
+    TaskEntity[] tasks = response.getBody();
 
     assertNotNull(tasks, "Expected: Not null");
-    assertEquals(numberOfTasks, tasks.size());
+    assertTrue(tasks.length != 0 && tasks.length >= preTasks.size());
+    assertTrue(Arrays.asList(tasks).containsAll(preTasks));
   }
 }

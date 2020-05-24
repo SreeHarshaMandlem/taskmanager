@@ -1,5 +1,6 @@
 package com.pet.tm.api.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity(name = "USER")
 @Data
+@AllArgsConstructor
 @Builder
 public class UserEntity {
 
@@ -15,4 +17,6 @@ public class UserEntity {
 
   @NotNull(message = "A User must have a name")
   private String name;
+
+  public UserEntity() {}
 }
