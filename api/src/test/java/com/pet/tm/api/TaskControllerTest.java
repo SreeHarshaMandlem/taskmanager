@@ -1,6 +1,7 @@
 package com.pet.tm.api;
 
 import com.pet.tm.api.dto.ErrorDto;
+import com.pet.tm.api.entity.CommentEntity;
 import com.pet.tm.api.entity.TaskEntity;
 import com.pet.tm.api.entity.UserEntity;
 import org.junit.jupiter.api.Assertions;
@@ -8,11 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,6 +29,8 @@ public class TaskControllerTest {
         testRestTemplate.postForEntity(
             TASK_API, TaskEntity.builder().description("Test description").build(), ErrorDto.class);
 
+    assertEquals(HttpStatus.PRECONDITION_FAILED.value(), response.getBody().getCode());
+
     ErrorDto errorDto = response.getBody();
 
     Assertions.assertNotNull(errorDto);
@@ -42,6 +42,8 @@ public class TaskControllerTest {
     ResponseEntity<ErrorDto> response =
         testRestTemplate.postForEntity(
             TASK_API, TaskEntity.builder().title("Test title").build(), ErrorDto.class);
+
+    assertEquals(HttpStatus.PRECONDITION_FAILED.value(), response.getBody().getCode());
 
     ErrorDto errorDto = response.getBody();
 
@@ -56,6 +58,8 @@ public class TaskControllerTest {
             TASK_API,
             TaskEntity.builder().title("Test title").description("Test description").build(),
             TaskEntity.class);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
 
     TaskEntity taskEntity = response.getBody();
 
@@ -88,6 +92,8 @@ public class TaskControllerTest {
                 .build(),
             TaskEntity.class);
 
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
     TaskEntity taskEntity = response.getBody();
 
     assertNotNull(taskEntity, "Task entity is null. Expected: Not null");
@@ -116,6 +122,8 @@ public class TaskControllerTest {
         testRestTemplate.getForEntity(
             TASK_API + "/" + taskResponse.getBody().getId(), TaskEntity.class);
 
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
     TaskEntity taskEntity = response.getBody();
 
     assertNotNull(taskEntity, "Task entity is null. Expected: Not null");
@@ -139,24 +147,111 @@ public class TaskControllerTest {
   @Test
   public void shouldGetTasks() {
     // Precondition Tasks must exist
-    List<TaskEntity> preTasks = new ArrayList<>();
     for (int i = 0; i < 2; i++) {
       ResponseEntity<TaskEntity> taskResponse =
           testRestTemplate.postForEntity(
               TASK_API,
               TaskEntity.builder().title("Test title").description("Test description").build(),
               TaskEntity.class);
-      preTasks.add(taskResponse.getBody());
     }
 
     // Test
     ResponseEntity<TaskEntity[]> response =
         testRestTemplate.getForEntity(TASK_API, TaskEntity[].class);
 
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
     TaskEntity[] tasks = response.getBody();
 
     assertNotNull(tasks, "Expected: Not null");
-    assertTrue(tasks.length != 0 && tasks.length >= preTasks.size());
-    assertTrue(Arrays.asList(tasks).containsAll(preTasks));
+    assertTrue(tasks.length > 0);
+  }
+
+  @Test
+  public void whenAddingComment_IfTitleIsEmpty_Expect_ErrorDto_MethodArgumentNotValidException() {
+    // Precondition Task must exist
+    ResponseEntity<TaskEntity> preResponse =
+        testRestTemplate.postForEntity(
+            TASK_API,
+            TaskEntity.builder().title("Test title").description("Test description").build(),
+            TaskEntity.class);
+
+    // Test
+    ResponseEntity<ErrorDto> response =
+        testRestTemplate.postForEntity(
+            TASK_API + "/" + preResponse.getBody().getId() + "/comment",
+            CommentEntity.builder().description("Test_Description").build(),
+            ErrorDto.class);
+
+    assertEquals(HttpStatus.PRECONDITION_FAILED.value(), response.getBody().getCode());
+
+    ErrorDto errorDto = response.getBody();
+
+    Assertions.assertNotNull(errorDto);
+    Assertions.assertTrue(errorDto.getMessage().contains("title"));
+  }
+
+  @Test
+  public void whenAddingComment_IfDescIsEmpty_Expect_ErrorDto_MethodArgumentNotValidException() {
+    // Precondition Task must exist
+    ResponseEntity<TaskEntity> preResponse =
+        testRestTemplate.postForEntity(
+            TASK_API,
+            TaskEntity.builder().title("Test title").description("Test description").build(),
+            TaskEntity.class);
+
+    // Test
+    ResponseEntity<ErrorDto> response =
+        testRestTemplate.postForEntity(
+            TASK_API + "/" + preResponse.getBody().getId() + "/comment",
+            CommentEntity.builder().title("Test_Title").build(),
+            ErrorDto.class);
+
+    assertEquals(HttpStatus.PRECONDITION_FAILED.value(), response.getBody().getCode());
+
+    ErrorDto errorDto = response.getBody();
+
+    Assertions.assertNotNull(errorDto);
+    Assertions.assertTrue(errorDto.getMessage().contains("description"));
+  }
+
+  @Test
+  public void whenAddingComment_IfTaskDoesNotExist_Expect_ErrorDto_TaskNotFoundException() {
+    // Test
+    ResponseEntity<ErrorDto> response =
+        testRestTemplate.postForEntity(
+            TASK_API + "/1001" + "/comment",
+            CommentEntity.builder().title("Test Title").description("Test_Description").build(),
+            ErrorDto.class);
+
+    ErrorDto errorDto = response.getBody();
+
+    Assertions.assertNotNull(errorDto);
+    Assertions.assertTrue(errorDto.getMessage().contains("Task with id: 1001 does not exist"));
+  }
+
+  @Test
+  public void shouldAddNewComment() {
+    // Precondition Task must exist
+    ResponseEntity<TaskEntity> preResponse =
+        testRestTemplate.postForEntity(
+            TASK_API,
+            TaskEntity.builder().title("Test title").description("Test description").build(),
+            TaskEntity.class);
+
+    assertNull(preResponse.getBody().getComments());
+    // Test
+    ResponseEntity response =
+        testRestTemplate.postForEntity(
+            TASK_API + "/" + preResponse.getBody().getId() + "/comment",
+            CommentEntity.builder().title("Test Title").description("Test_Description").build(),
+            null);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    ResponseEntity<TaskEntity> postResponse =
+        testRestTemplate.getForEntity(
+            TASK_API + "/" + preResponse.getBody().getId(), TaskEntity.class);
+
+    assertEquals(1, postResponse.getBody().getComments().size());
   }
 }
