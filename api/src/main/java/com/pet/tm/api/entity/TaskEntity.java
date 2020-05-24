@@ -6,6 +6,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "TASK")
 @Data
@@ -26,6 +28,10 @@ public class TaskEntity {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "ASSIGNEE")
   private UserEntity assignee;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "TASK_ID", referencedColumnName = "ID")
+  private List<CommentEntity> comments = new ArrayList<>();
 
   public TaskEntity() {}
 }
