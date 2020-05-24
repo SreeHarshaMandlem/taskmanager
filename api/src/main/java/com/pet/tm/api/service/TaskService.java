@@ -1,5 +1,6 @@
 package com.pet.tm.api.service;
 
+import com.pet.tm.api.entity.CommentEntity;
 import com.pet.tm.api.entity.TaskEntity;
 import com.pet.tm.api.exception.InvalidPropertyValueException;
 import com.pet.tm.api.exception.TaskNotFoundException;
@@ -43,7 +44,14 @@ public class TaskService {
         .findById(id)
         .orElseThrow(
             () -> {
-              throw new TaskNotFoundException("Task with id: " + id + "does not exist");
+              throw new TaskNotFoundException("Task with id: " + id + " does not exist");
             });
+  }
+
+  public void addComment(@NonNull final Long taskId, CommentEntity comment) {
+    TaskEntity taskEntity = getTaskById(taskId);
+    comment.setTaskId(taskEntity.getId());
+    taskEntity.getComments().add(comment);
+    taskRepository.save(taskEntity);
   }
 }
