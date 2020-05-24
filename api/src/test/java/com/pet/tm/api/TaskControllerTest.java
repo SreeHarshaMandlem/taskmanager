@@ -147,8 +147,7 @@ public class TaskControllerTest {
   @Test
   public void whenFetchingTask_IfTaskDoesNotExist_Expect_ErrorDto_TaskNotFoundException() {
     ResponseEntity<ErrorDto> response =
-        testRestTemplate.getForEntity(
-            TASK_API + "/" + "1001", ErrorDto.class);
+        testRestTemplate.getForEntity(TASK_API + "/" + "1001", ErrorDto.class);
 
     assertEquals(HttpStatus.NOT_FOUND.value(), response.getBody().getCode());
 
@@ -267,5 +266,36 @@ public class TaskControllerTest {
             TASK_API + "/" + preResponse.getBody().getId(), TaskEntity.class);
 
     assertEquals(1, postResponse.getBody().getComments().size());
+  }
+
+  @Test
+  public void shouldUnassignTask() {
+    // Precondition User must exist
+    ResponseEntity<UserEntity> createUserResponse =
+        testRestTemplate.postForEntity(
+            USER_API, UserEntity.builder().name("Test Name").build(), UserEntity.class);
+
+    ResponseEntity<TaskEntity> createTaskResponse =
+        testRestTemplate.postForEntity(
+            TASK_API,
+            TaskEntity.builder()
+                .title("Test title")
+                .description("Test description")
+                .assignee(createUserResponse.getBody())
+                .build(),
+            TaskEntity.class);
+
+    TaskEntity taskEntity = createTaskResponse.getBody();
+
+    assertNotNull(taskEntity.getAssignee());
+
+    testRestTemplate.put(TASK_API + "/" + taskEntity.getId() + "/unassign", null);
+
+    ResponseEntity<TaskEntity> response =
+        testRestTemplate.getForEntity(TASK_API + "/" + taskEntity.getId(), TaskEntity.class);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    assertNull(response.getBody().getAssignee());
   }
 }

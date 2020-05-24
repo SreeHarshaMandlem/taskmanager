@@ -54,4 +54,10 @@ public class TaskService {
     taskEntity.getComments().add(comment);
     taskRepository.save(taskEntity);
   }
+
+  public void unassign(@NonNull Long taskId) {
+    TaskEntity taskEntity = getTaskById(taskId);
+    taskEntity.setAssignee(null);
+    taskRepository.save(taskEntity);
+  }
 }

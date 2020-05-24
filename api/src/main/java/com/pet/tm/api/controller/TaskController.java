@@ -48,4 +48,11 @@ public class TaskController {
       @Valid @NotNull @RequestBody CommentEntity comment) {
     taskService.addComment(taskId, comment);
   }
+
+  @PutMapping(
+      path = "/{taskId}/unassign")
+  public void unassignTask(
+      @NotNull @PathVariable("taskId") Long taskId) {
+    taskService.unassign(taskId);
+  }
 }
