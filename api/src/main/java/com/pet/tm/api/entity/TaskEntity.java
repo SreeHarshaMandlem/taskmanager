@@ -1,5 +1,6 @@
 package com.pet.tm.api.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity(name = "TASK")
 @Data
+@AllArgsConstructor
 @Builder
 public class TaskEntity {
 
@@ -24,4 +26,6 @@ public class TaskEntity {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "ASSIGNEE")
   private UserEntity assignee;
+
+  public TaskEntity() {}
 }
