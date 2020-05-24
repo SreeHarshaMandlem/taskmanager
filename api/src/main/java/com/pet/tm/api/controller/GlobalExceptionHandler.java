@@ -2,6 +2,7 @@ package com.pet.tm.api.controller;
 
 import com.pet.tm.api.dto.ErrorDto;
 import com.pet.tm.api.exception.InvalidPropertyValueException;
+import com.pet.tm.api.exception.TaskNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   private static Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+  /**
+   * Handles {@link TaskNotFoundException} types.
+   *
+   * @param exception of type TaskNotFoundException
+   * @return ErrorDto
+   */
+  @ExceptionHandler(TaskNotFoundException.class)
+  public ErrorDto handleTaskNotFoundException(TaskNotFoundException exception) {
+    return ErrorDto.builder()
+        .code(HttpStatus.NOT_FOUND.value())
+        .message(exception.getMessage())
+        .build();
+  }
 
   /**
    * Handles {@link InvalidPropertyValueException} types.
