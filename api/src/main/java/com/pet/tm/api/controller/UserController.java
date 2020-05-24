@@ -1,14 +1,14 @@
 package com.pet.tm.api.controller;
 
+import com.pet.tm.api.entity.TaskEntity;
 import com.pet.tm.api.entity.UserEntity;
 import com.pet.tm.api.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -25,5 +25,15 @@ public class UserController {
   @PostMapping(consumes = APPLICATION_JSON_VALUE)
   public UserEntity createUser(@Valid @NotNull @RequestBody UserEntity user) {
     return userService.createUser(user);
+  }
+
+  @GetMapping(produces = APPLICATION_JSON_VALUE)
+  public List<UserEntity> getAllUsers() {
+    return userService.getAllUsers();
+  }
+
+  @GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
+  public UserEntity getUser(@NotNull @PathVariable("id") Long id) {
+    return userService.getUserById(id);
   }
 }

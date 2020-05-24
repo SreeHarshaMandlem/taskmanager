@@ -3,6 +3,7 @@ package com.pet.tm.api.controller;
 import com.pet.tm.api.dto.ErrorDto;
 import com.pet.tm.api.exception.InvalidPropertyValueException;
 import com.pet.tm.api.exception.TaskNotFoundException;
+import com.pet.tm.api.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,20 @@ public class GlobalExceptionHandler {
   private static Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   /**
+   * Handles {@link UserNotFoundException} types.
+   *
+   * @param exception of type UserNotFoundException
+   * @return ErrorDto
+   */
+  @ExceptionHandler(UserNotFoundException.class)
+  public ErrorDto handleUserNotFoundException(UserNotFoundException exception) {
+	return ErrorDto.builder()
+			.code(HttpStatus.NOT_FOUND.value())
+			.message(exception.getMessage())
+			.build();
+  }
+
+  /**
    * Handles {@link TaskNotFoundException} types.
    *
    * @param exception of type TaskNotFoundException
@@ -24,10 +39,10 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(TaskNotFoundException.class)
   public ErrorDto handleTaskNotFoundException(TaskNotFoundException exception) {
-    return ErrorDto.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(exception.getMessage())
-        .build();
+	return ErrorDto.builder()
+			.code(HttpStatus.NOT_FOUND.value())
+			.message(exception.getMessage())
+			.build();
   }
 
   /**

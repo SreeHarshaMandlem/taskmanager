@@ -145,6 +145,20 @@ public class TaskControllerTest {
   }
 
   @Test
+  public void whenFetchingTask_IfTaskDoesNotExist_Expect_ErrorDto_TaskNotFoundException() {
+    ResponseEntity<ErrorDto> response =
+        testRestTemplate.getForEntity(
+            TASK_API + "/" + "1001", ErrorDto.class);
+
+    assertEquals(HttpStatus.NOT_FOUND.value(), response.getBody().getCode());
+
+    ErrorDto errorDto = response.getBody();
+
+    Assertions.assertNotNull(errorDto);
+    Assertions.assertTrue(errorDto.getMessage().contains("Task with id: 1001 does not exist"));
+  }
+
+  @Test
   public void shouldGetTasks() {
     // Precondition Tasks must exist
     for (int i = 0; i < 2; i++) {
